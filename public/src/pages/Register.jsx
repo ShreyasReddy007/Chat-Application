@@ -63,34 +63,34 @@ function Register(){
     return(
         <>
         <FormContainer>
-           <form onsubmit= {(event)=>handleSubmit(event)}>
+           <form onSubmit= {(event)=>handleSubmit(event)}>
             <div className="brand">
-                <img src="Logo" alt="Logo" />
+                <img src={Logo} alt="Logo" />
                 <h1>PingPal</h1>
             </div>
             <input 
             type="text" 
             placeholder="Username" 
             name="username" 
-            onChnage={e=>handleChange(e)} 
+            onChange={e=>handleChange(e)} 
             />
              <input 
             type="email" 
             placeholder="Email" 
             name="email" 
-            onChnage={e=>handleChange(e)} 
+            onChange={e=>handleChange(e)} 
             />
              <input 
             type="password" 
             placeholder="Password" 
             name="password" 
-            onChnage={e=>handleChange(e)} 
+            onChange={e=>handleChange(e)} 
             />
              <input 
             type="password" 
             placeholder="Confrim Password" 
             name="confirmPassword" 
-            onChnage={e=>handleChange(e)} 
+            onChange={e=>handleChange(e)} 
             />
             <button type="submit">Create User</button>
             <span> 
