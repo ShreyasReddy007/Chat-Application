@@ -17,6 +17,7 @@
 /public/chat-app/.env.development.local
 /public/chat-app/.env.test.local
 /public/chat-app/.env.production.local
+/public/node_modules
 
 /public/chat-app/npm-debug.log*
 /public/chat-app/yarn-debug.log*
