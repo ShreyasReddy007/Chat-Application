@@ -22,7 +22,7 @@ function Login(){
 
     useEffect(() => {
     if (localStorage.getItem('chat-app-user')) {
-      navigate("/");
+      navigate("/login");
     }
   }, []);
     const handleSubmit = async (event) => {
@@ -40,7 +40,7 @@ function Login(){
           if(data.status===true){
             localStorage.setItem('chat-app-user',JSON.stringify(data.user));
           }
-        // navigate("/");
+        navigate("/");
         } catch (error) {
           console.error("Registration failed:", error);
         }
