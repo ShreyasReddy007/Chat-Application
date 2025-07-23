@@ -1,9 +1,10 @@
 // See later about the localStorage part where we might get some trouble.
 
-import React,{useState,useEffect} from "react";
+import React,{useState,useEffect,useRef} from "react";
 import styled from "styled-components";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
+import Contacts from "../components/Contacts";
 function Chat(){
     const navigate = useNavigate();
     const socket = useRef();
@@ -11,28 +12,32 @@ function Chat(){
     const [currentChat, setCurrentChat] = useState(undefined);
     const [currentUser, setCurrentUser] = useState(undefined);
 
-    useEffect(async () => {
-        if (!localStorage.getItem("chat-app-user")) {
-          navigate("/login");
-        } else {
-          setCurrentUser(
-            await JSON.parse(
-              localStorage.getItem("chat-app-user")
-            )
-          );
-        }
-      }, []);
+    useEffect(() => {
+  const getUser = async () => {
+    if (!localStorage.getItem("chat-app-user")) {
+      navigate("/login");
+    } else {
+      setCurrentUser(
+        JSON.parse(localStorage.getItem("chat-app-user"))
+      );
+    }
+  };
+  getUser();
+}, []);
 
-    useEffect(async () => {
-        if (currentUser) {
-          if (currentUser.isAvatarImageSet) {
-            const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-            setContacts(data.data);
-          } else {
-            navigate("/setAvatar");
-          }
-        }
-      }, [currentUser]);
+useEffect(() => {
+  const getContacts = async () => {
+    if (currentUser) {
+      if (currentUser.isAvatarImageSet) {
+        const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+        setContacts(data.data);
+      } else {
+        navigate("/setAvatar");
+      }
+    }
+  };
+  getContacts();
+}, [currentUser]);
 
     return (
     <Container>

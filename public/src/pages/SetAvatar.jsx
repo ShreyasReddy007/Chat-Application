@@ -36,26 +36,26 @@ export default function SetAvatar() {
 
   // ✅ Fetch random avatars
   useEffect(() => {
-    const fetchAvatars = async () => {
-      try {
-        const data = [];
-        for (let i = 0; i < 4; i++) {
-          const response = await axios.get(`${api}/${Math.round(Math.random() * 1000)}`, {
-            responseType: "text", // SVG is text
-          });
-          const buffer = Buffer.from(response.data);
-          data.push(buffer.toString("base64"));
-        }
-        setAvatars(data);
-        setIsLoading(false);
-      } catch (err) {
-        toast.error("Failed to load avatars. Please try again.", toastOptions);
-        setIsLoading(false);
+  const fetchAvatars = async () => {
+    try {
+      const avatarsArray = [];
+      for (let i = 0; i < 4; i++) {
+        const res = await axios.get(
+          `https://api.multiavatar.com/${Math.round(Math.random() * 1000)}.svg`,
+          { responseType: "text" }
+        );
+        avatarsArray.push(res.data);
       }
-    };
+      setAvatars(avatarsArray);
+      setIsLoading(false);
+    } catch (error) {
+      console.error("Error loading avatars", error);
+      toast.error("Failed to load avatars. Please try again.");
+    }
+  };
 
-    fetchAvatars();
-  }, []);
+  fetchAvatars();
+}, []);
 
   // ✅ Set selected avatar
   const setProfilePicture = async () => {
