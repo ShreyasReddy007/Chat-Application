@@ -7,10 +7,9 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { setAvatarRoute } from "../utils/APIRoutes";
+import multiavatar from "@multiavatar/multiavatar/esm"; //Import the new generator for multiavatar API
 
 export default function SetAvatar() {
-  const api = `https://api.multiavatar.com`;
-
   const navigate = useNavigate();
   const [avatars, setAvatars] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -24,7 +23,6 @@ export default function SetAvatar() {
     theme: "dark",
   };
 
-  // ✅ Check login status on mount
   useEffect(() => {
     const checkUser = async () => {
       if (!localStorage.getItem("chat-app-user")) {
@@ -34,30 +32,16 @@ export default function SetAvatar() {
     checkUser();
   }, [navigate]);
 
-  // ✅ Fetch random avatars
   useEffect(() => {
-  const fetchAvatars = async () => {
-    try {
-      const avatarsArray = [];
-      for (let i = 0; i < 4; i++) {
-        const res = await axios.get(
-          `https://api.multiavatar.com/${Math.round(Math.random() * 1000)}.svg`,
-          { responseType: "text" }
-        );
-        avatarsArray.push(res.data);
-      }
-      setAvatars(avatarsArray);
-      setIsLoading(false);
-    } catch (error) {
-      console.error("Error loading avatars", error);
-      toast.error("Failed to load avatars. Please try again.");
+    const data = [];
+    for (let i = 0; i < 6; i++) {
+      const svg = multiavatar(Math.round(Math.random() * 1000).toString());
+      data.push(svg);
     }
-  };
+    setAvatars(data);
+    setIsLoading(false);
+  }, []);
 
-  fetchAvatars();
-}, []);
-
-  // ✅ Set selected avatar
   const setProfilePicture = async () => {
     if (selectedAvatar === undefined) {
       toast.error("Please select an avatar", toastOptions);
@@ -95,12 +79,15 @@ export default function SetAvatar() {
           <div className="avatars">
             {avatars.map((avatar, index) => (
               <div
-                key={index} // ✅ this is critical
+                key={index}
                 className={`avatar ${selectedAvatar === index ? "selected" : ""}`}
                 onClick={() => setSelectedAvatar(index)}
               >
+                {/*Correctly encode the SVG string to Base64 */}
                 <img
-                  src={`data:image/svg+xml;base64,${avatar}`}
+                  src={`data:image/svg+xml;base64,${Buffer.from(avatar).toString(
+                    "base64"
+                  )}`}
                   alt={`avatar-${index}`}
                 />
               </div>
