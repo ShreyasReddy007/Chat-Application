@@ -8,7 +8,7 @@ export default function Contacts({ contacts, changeChat }) {
   const [currentSelected, setCurrentSelected] = useState(undefined);
  useEffect(() => {
   const fetchUser = async () => {
-    const localData = localStorage.getItem(process.env.REACT_APP_LOCALHOST_KEY);
+    const localData = localStorage.getItem("chat-app-user");
     if (localData) {
       const data = JSON.parse(localData);
       setCurrentUserName(data.username);
@@ -28,7 +28,7 @@ export default function Contacts({ contacts, changeChat }) {
         <Container>
           <div className="brand">
             <img src={Logo} alt="logo" />
-            <h3>snappy</h3>
+            <h3>PingPal</h3>
           </div>
           <div className="contacts">
             {contacts.map((contact, index) => {
