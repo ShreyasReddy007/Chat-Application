@@ -1,56 +1,88 @@
-// See later about the localStorage part where we might get some trouble.
-
-import React,{useState,useEffect,useRef} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import styled from "styled-components";
 import axios from "axios";
-import {useNavigate} from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { allUsersRoute } from "../utils/APIRoutes";
 import Contacts from "../components/Contacts";
-function Chat(){
-    const navigate = useNavigate();
-    const socket = useRef();
-    const [contacts, setContacts] = useState([]);
-    const [currentChat, setCurrentChat] = useState(undefined);
-    const [currentUser, setCurrentUser] = useState(undefined);
+import ChatContainer from "../components/ChatContainer";
+import Welcome from "../components/Welcome";
 
-    useEffect(() => {
-  const getUser = async () => {
-    if (!localStorage.getItem("chat-app-user")) {
-      navigate("/login");
-    } else {
-      setCurrentUser(
-        JSON.parse(localStorage.getItem("chat-app-user"))
-      );
-    }
-  };
-  getUser();
-}, []);
+function Chat() {
+  const navigate = useNavigate();
+  const socket = useRef();
+  const [contacts, setContacts] = useState([]);
+  const [currentChat, setCurrentChat] = useState(undefined);
+  const [currentUser, setCurrentUser] = useState(undefined);
 
-useEffect(() => {
-  const getContacts = async () => {
-    if (currentUser) {
-      if (currentUser.isAvatarImageSet) {
-        const data = await axios.get(`${allUsersRoute}/${currentUser._id}`);
-        setContacts(data.data);
-      } else {
-        navigate("/setAvatar");
+  // Get user from localStorage safely
+  useEffect(() => {
+    const getUser = async () => {
+      try {
+        const userData = localStorage.getItem("chat-app-user");
+        if (!userData) {
+          navigate("/login");
+        } else {
+          setCurrentUser(JSON.parse(userData));
+        }
+      } catch (err) {
+        console.error("Error parsing user from localStorage:", err);
+        navigate("/login");
       }
-    }
-  };
-  getContacts();
-}, [currentUser]);
+    };
+    getUser();
+  }, [navigate]);
 
-    return (
+  // Fetch contacts only if user is set and avatar is set
+  useEffect(() => {
+    const getContacts = async () => {
+      if (currentUser) {
+        if (currentUser.isAvatarImageSet) {
+          try {
+            const response = await axios.get(`${allUsersRoute}/${currentUser._id}`);
+            setContacts(response.data);
+          } catch (error) {
+            console.error("Failed to fetch contacts:", error);
+          }
+        } else {
+          navigate("/setAvatar");
+        }
+      }
+    };
+    getContacts();
+  }, [currentUser, navigate]);
+
+  const handleChatChange = (chat) => {
+    setCurrentChat(chat);
+  };
+
+  // Prevent rendering until user is loaded
+  if (!currentUser) return <Loading>Loading user...</Loading>;
+
+  return (
     <Container>
-        <div className="container">
-            <Contacts contacts={contacts} currentUser={currentUser} />
-        </div>
+      <div className="container">
+        <Contacts
+          contacts={contacts}
+          currentUser={currentUser}
+          changeChat={handleChatChange}
+        />
+        {currentChat === undefined ? (
+          <Welcome currentUser={currentUser} />
+        ) : (
+          <ChatContainer
+            currentChat={currentChat}
+            currentUser={currentUser}
+            socket={socket}
+          />
+        )}
+      </div>
     </Container>
-    );
+  );
 }
 
-export default Chat
+export default Chat;
 
+// Styled components
 const Container = styled.div`
   height: 100vh;
   width: 100vw;
@@ -60,6 +92,7 @@ const Container = styled.div`
   gap: 1rem;
   align-items: center;
   background-color: #131324;
+
   .container {
     height: 85vh;
     width: 85vw;
@@ -70,4 +103,11 @@ const Container = styled.div`
       grid-template-columns: 35% 65%;
     }
   }
+`;
+
+const Loading = styled.div`
+  color: white;
+  font-size: 1.5rem;
+  text-align: center;
+  padding: 2rem;
 `;
