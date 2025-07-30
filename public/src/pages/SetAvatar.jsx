@@ -7,7 +7,7 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
 import { setAvatarRoute } from "../utils/APIRoutes";
-import multiavatar from "@multiavatar/multiavatar/esm"; //Import the new generator for multiavatar API
+import multiavatar from "@multiavatar/multiavatar/esm"; //Import the generator for multiavatar API
 
 export default function SetAvatar() {
   const navigate = useNavigate();
@@ -83,7 +83,7 @@ export default function SetAvatar() {
                 className={`avatar ${selectedAvatar === index ? "selected" : ""}`}
                 onClick={() => setSelectedAvatar(index)}
               >
-                {/*Correctly encode the SVG string to Base64 */}
+                {/* Encode the SVG string to Base64 as it was previosuly causing error */}
                 <img
                   src={`data:image/svg+xml;base64,${Buffer.from(avatar).toString(
                     "base64"
