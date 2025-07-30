@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BsEmojiSmileFill } from "react-icons/bs";
 import { IoMdSend } from "react-icons/io";
 import styled from "styled-components";
@@ -7,14 +7,27 @@ import Picker from "emoji-picker-react";
 export default function ChatInput({ handleSendMsg }) {
   const [msg, setMsg] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+
   const handleEmojiPickerhideShow = () => {
-    setShowEmojiPicker(!showEmojiPicker);
+    setShowEmojiPicker((prev) => !prev);
   };
 
-  const handleEmojiClick = (event, emojiObject) => {
-    let message = msg;
-    message += emojiObject.emoji;
-    setMsg(message);
+  // For emoji Search
+  useEffect(() => {
+    if (showEmojiPicker) {
+      setTimeout(() => {
+        const searchInput = document.querySelector(".emoji-picker-react input[type='search']");
+        if (searchInput) {
+          searchInput.value = "";
+          searchInput.focus();
+        }
+      }, 0);
+    }
+  }, [showEmojiPicker]);
+
+  // Correct emoji click handler
+  const handleEmojiClick = (emojiObject, event) => {
+    setMsg((prevMsg) => prevMsg + emojiObject.emoji);
   };
 
   const sendChat = (event) => {
@@ -30,10 +43,12 @@ export default function ChatInput({ handleSendMsg }) {
       <div className="button-container">
         <div className="emoji">
           <BsEmojiSmileFill onClick={handleEmojiPickerhideShow} />
-          {showEmojiPicker && <Picker onEmojiClick={handleEmojiClick} />}
+          {showEmojiPicker && (
+            <Picker onEmojiClick={handleEmojiClick} preload emojiStyle="native" />
+          )}
         </div>
       </div>
-      <form className="input-container" onSubmit={(event) => sendChat(event)}>
+      <form className="input-container" onSubmit={sendChat}>
         <input
           type="text"
           placeholder="type your message here"
@@ -72,10 +87,12 @@ const Container = styled.div`
       }
       .emoji-picker-react {
         position: absolute;
-        top: -350px;
+        bottom: 50px; /* Open above the button */
+        left: 0;
         background-color: #080420;
         box-shadow: 0 5px 10px #9a86f3;
         border-color: #9a86f3;
+        z-index: 9999;
         .emoji-scroll-wrapper::-webkit-scrollbar {
           background-color: #080420;
           width: 5px;
@@ -113,7 +130,6 @@ const Container = styled.div`
       border: none;
       padding-left: 1rem;
       font-size: 1.2rem;
-
       &::selection {
         background-color: #9a86f3;
       }

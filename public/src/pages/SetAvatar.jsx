@@ -47,13 +47,16 @@ export default function SetAvatar() {
       toast.error("Please select an avatar", toastOptions);
     } else {
       try {
+        const svgString = avatars[selectedAvatar];
+        // Base64 encode the svgString BEFORE sending to backend
+        const base64Avatar = Buffer.from(svgString).toString("base64");
         const user = JSON.parse(localStorage.getItem("chat-app-user"));
         const { data } = await axios.post(`${setAvatarRoute}/${user._id}`, {
-          image: avatars[selectedAvatar],
+          image: base64Avatar,
         });
         if (data.isSet) {
           user.isAvatarImageSet = true;
-          user.avatarImage = data.image;
+          user.avatarImage = data.image; // base64 string returned by backend
           localStorage.setItem("chat-app-user", JSON.stringify(user));
           navigate("/");
         } else {
@@ -83,7 +86,7 @@ export default function SetAvatar() {
                 className={`avatar ${selectedAvatar === index ? "selected" : ""}`}
                 onClick={() => setSelectedAvatar(index)}
               >
-                {/* Encode the SVG string to Base64 as it was previosuly causing error */}
+                {/* Display avatar as base64-encoded SVG */}
                 <img
                   src={`data:image/svg+xml;base64,${Buffer.from(avatar).toString(
                     "base64"
