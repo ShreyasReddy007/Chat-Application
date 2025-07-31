@@ -51,6 +51,11 @@ module.exports.setAvatar = async (req, res, next) => {
   try {
     const userId = req.params.id;
     const avatarImage = req.body.image;
+
+    if (!avatarImage) {
+      return res.status(400).json({ msg: "Avatar image is required", isSet: false });
+    }
+
     const userData = await User.findByIdAndUpdate(
       userId,
       {
@@ -59,14 +64,20 @@ module.exports.setAvatar = async (req, res, next) => {
       },
       { new: true }
     );
+
+    if (!userData) {
+      return res.status(404).json({ msg: "User not found", isSet: false });
+    }
+
     return res.json({
       isSet: userData.isAvatarImageSet,
       image: userData.avatarImage,
     });
   } catch (ex) {
-    next(ex);
+    console.error("Error in setAvatar:", ex);
+    return res.status(500).json({ msg: "Internal server error", isSet: false });
   }
-}
+};
 
 module.exports.getAllUsers = async (req, res, next) => {
   try {

@@ -22,9 +22,9 @@ function Login(){
 
     useEffect(() => {
     if (localStorage.getItem('chat-app-user')) {
-      navigate("/login");
+      navigate("/chat");
     }
-  }, []);
+  }, [navigate]);
     const handleSubmit = async (event) => {
       event.preventDefault();
       if (handleValidation()) {
